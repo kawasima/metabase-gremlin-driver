@@ -1,0 +1,16 @@
+info:
+  name: Metabase Gremlin Driver
+  version: 0.1.0-SNAPSHOT
+  description: Allows Metabase to connect to Graph database via Gremlin
+driver:
+  name: gremlin
+  lazy-load: true
+  display-name: Gremlin
+  connection-properties:
+    - name: host
+      display-name: host
+    - name: port
+      display-name: port
+init:
+  - step: load-namespace
+    namespace: metabase.driver.gremlin

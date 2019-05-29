@@ -1,0 +1,14 @@
+{:duct.profile/base
+ {:duct.core/project-ns tinkerpop
+
+  :duct.profile/dev   #duct/include "dev"
+  :duct.profile/local #duct/include "local"
+  :duct.profile/prod  {}
+
+  :duct.logger/timbre
+  {:level     :debug
+   :appenders {:println #ig/ref :duct.logger.timbre/println}}
+
+  :duct.logger.timbre/println {}
+  :duct.module/logging {}
+  :tinkerpop/graph-server {:logger #ig/ref :duct/logger}}}
