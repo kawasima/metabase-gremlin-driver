@@ -8,9 +8,18 @@ driver:
   display-name: Gremlin
   connection-properties:
     - name: host
-      display-name: host
+      display-name: Host
     - name: port
-      display-name: port
+      display-name: Port
+    - name: protocol
+      display-name: "Protocol (default: HTTP)"
+      required: false
+    - name: username
+      display-name: Username
+      required: false
+    - name: password
+      display-name: Password
+      required: false
 init:
   - step: load-namespace
     namespace: metabase.driver.gremlin

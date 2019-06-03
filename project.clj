@@ -1,8 +1,6 @@
-(defproject metabase/gremlin-driver "0.1.0-SNAPSHOT"
+(defproject metabase/gremlin-driver "0.1.0"
   :min-lein-version "2.5.0"
-  :dependencies [[org.apache.tinkerpop/gremlin-driver "3.4.1"]
-                 [duct/core "0.7.0"]
-                 [duct/module.logging "0.4.0"]]
+  :dependencies [[org.apache.tinkerpop/gremlin-driver "3.4.1"]]
 
   :jvm-opts
   ["-XX:+IgnoreUnrecognizedVMOptions"]
@@ -23,6 +21,8 @@
                   }
    :project/dev {:dependencies
                  [[org.apache.tinkerpop/gremlin-server "3.4.1"]
+                  [duct/core "0.7.0"]
+                  [duct/module.logging "0.4.0"]
                   [integrant/repl "0.3.1"]
                   [eftest "0.5.7"]]
                  :source-paths ["dev/src"]

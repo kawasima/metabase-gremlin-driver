@@ -6,18 +6,20 @@
 
 (defn -with-gremlin-client
   [f database]
-  (let [cluster (-> (Cluster/build)
+  (let [builder (-> (Cluster/build)
                     (.port            (get database :port 8182))
                     (.addContactPoint (get database :host))
-                    (.enableSsl       (get database :ssl? false))
-                    (.serializer      (GraphSONMessageSerializerV2d0.))
-;                    (.credentials username password)
-                    (.create))
-        client (.connect cluster)]
-    (try
-      (binding [*gremlin-client* client]
-        (f *gremlin-client*))
-      (finally (.close client)))))
+                    (.enableSsl       (not= (get database :protocol "http") "http"))
+                    (.serializer      (GraphSONMessageSerializerV2d0.)))
+        username (:username database)
+        password (:password database)]
+    (when (and username password)
+      (.credentials builder username password))
+    (when-let [client (.connect (.create builder))]
+      (try
+        (binding [*gremlin-client* client]
+          (f *gremlin-client*))
+        (finally (.close client))))))
 
 (defmacro with-gremlin-client
   "Open a new Gremlin client"
