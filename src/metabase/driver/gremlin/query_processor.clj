@@ -22,10 +22,16 @@
   (for [col columns]
     (get m col)))
 
+(defn- unnested-seq [s]
+  (if (and (seq? s) (= (count s) 1) (seq? (first s)))
+    (first s)
+    s))
+
 (defn gremlin-query-results [query]
   (let [result-seq (-> (.submit *gremlin-client* query)
                        .iterator
                        iterator-seq)
+;        _ (map println result-seq)
         results (->> result-seq
                      (map #(condp instance? (.getObject %)
                              String        {"item" (.getString %)}
@@ -37,10 +43,11 @@
                              Boolean       {"item" (.getBoolean %)}
                              Edge          (element->map (.getEdge %))
                              Vertex        (element->map (.getVertex %))
-                             java.util.Map (let [m (.getObject %)
-                                                 k (first (.keySet m))]
-                                             {"item" k, "count" (.get m k)})
+                             java.util.Map (let [m (.getObject %)]
+                                             (for [k (.keySet m)]
+                                               {"item" k, "count" (.get m k)}))
                              (.getObject %)))
+                     unnested-seq
                      vec)
 
         columns (->> results
