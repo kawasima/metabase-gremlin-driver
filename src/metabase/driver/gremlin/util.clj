@@ -7,12 +7,12 @@
 (defn -with-gremlin-client
   [f database]
   (let [builder (-> (Cluster/build)
-                    (.port            (get database :port 8182))
-                    (.addContactPoint (get database :host))
-                    (.enableSsl       (not= (get database :protocol "http") "http"))
+                    (.port            (-> (get-in database [:details :port] "8182") bigint int))
+                    (.addContactPoint (get-in database [:details :host]))
+                    (.enableSsl       (not= (get-in database [:details :protocol] "http") "http"))
                     (.serializer      (GraphSONMessageSerializerV2d0.)))
-        username (:username database)
-        password (:password database)]
+        username (get-in database [:details :username])
+        password (get-in database [:details :password])]
     (when (and username password)
       (.credentials builder username password))
     (when-let [client (.connect (.create builder))]
