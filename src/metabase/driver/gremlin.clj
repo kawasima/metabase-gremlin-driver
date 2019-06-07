@@ -30,4 +30,9 @@
 
 (defmethod driver/execute-query :gremlin [_ {{query :query} :native, :as native-query}]
   (println "native-query:" native-query)
-  (qp/gremlin-query-results query))
+  (try
+    (qp/gremlin-query-results query)
+    (catch Exception e
+      (.printStackTrace e)
+      (throw e)))
+  )

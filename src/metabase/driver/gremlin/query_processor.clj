@@ -27,11 +27,30 @@
     (first s)
     s))
 
+(defn- element-map->result-map [m]
+  (->> (.entrySet (.get m "properties"))
+       (map (fn [e] [(.getKey e) (->> (.getValue e)
+                                      (map #(.get % "value"))
+                                      (clojure.string/join ","))]))
+       (reduce #(assoc %1 (first %2) (second %2)) {})))
+
+(defmulti parse-map (fn [m] (.get m "type")))
+
+(defmethod parse-map "vertex" [m]
+  (element-map->result-map m))
+
+(defmethod parse-map "edge" [m]
+  (element-map->result-map m))
+
+(defmethod parse-map :default [m]
+  (for [k (.keySet m)]
+    {"item" k, "count" (.get m k)}))
+
 (defn gremlin-query-results [query]
   (let [result-seq (-> (.submit *gremlin-client* query)
                        .iterator
                        iterator-seq)
-;        _ (map println result-seq)
+        _ (println result-seq)
         results (->> result-seq
                      (map #(condp instance? (.getObject %)
                              String        {"item" (.getString %)}
@@ -43,9 +62,7 @@
                              Boolean       {"item" (.getBoolean %)}
                              Edge          (element->map (.getEdge %))
                              Vertex        (element->map (.getVertex %))
-                             java.util.Map (let [m (.getObject %)]
-                                             (for [k (.keySet m)]
-                                               {"item" k, "count" (.get m k)}))
+                             java.util.Map (parse-map (.getObject %))
                              (.getObject %)))
                      unnested-seq
                      vec)
